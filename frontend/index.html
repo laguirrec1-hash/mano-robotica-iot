@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control P.H.A.N.T.O.M</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #eef2f3; }
+        .btn { padding: 15px 25px; font-size: 18px; cursor: pointer; margin: 10px; border-radius: 8px; border: none; background: #007bff; color: white; }
+        .log-container { background: #333; color: #0f0; padding: 20px; width: 80%; margin: 20px auto; border-radius: 10px; min-height: 100px; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Panel de Control Robot P.H.A.N.T.O.M</h1>
+    
+    <button class="btn" onclick="enviar('saludar')">CERRAR DEDO</button>
+    <button class="btn" onclick="enviar('abrir')">ABRIR DEDO</button>
+    <button class="btn" style="background:#dc3545;" onclick="enviar('detener')">PARAR</button>
+
+    <h3>Historial de Movimientos:</h3>
+    <div id="logs" class="log-container">Cargando logs...</div>
+
+    <script>
+        const IP = "143.244.153.38:5000";
+
+        async function enviar(cmd) {
+            await fetch(`http://${IP}/mandar_comando?comando=${cmd}`);
+            cargarLogs();
+        }
+
+        async function cargarLogs() {
+            try {
+                const res = await fetch(`http://${IP}/logs`);
+                const data = await res.json();
+                let html = "";
+                data.forEach(log => {
+                    html += `<div>[${log.timestamp}] Comando enviado: <b>${log.comando}</b></div>`;
+                });
+                document.getElementById('logs').innerHTML = html || "Sin actividad";
+            } catch (e) {
+                document.getElementById('logs').innerHTML = "Error de conexión con el servidor";
+            }
+        }
+
+        // Recargar logs cada 3 segundos
+        setInterval(cargarLogs, 3000);
+        cargarLogs();
+    </script>
+</body>
+</html>

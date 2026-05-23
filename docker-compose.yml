@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  # 1. La Base de Datos (MongoDB)
+  database:
+    image: mongo
+    container_name: mongodb_phantom
+    ports:
+      - "27017:27017"
+
+  # 2. El Backend (Tu programa en Python)
+  backend:
+    build: ./backend
+    container_name: backend_phantom
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+
+  # 3. El Frontend (La página web)
+  frontend:
+    image: nginx:alpine
+    container_name: frontend_phantom
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
